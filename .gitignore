@@ -1,0 +1,8 @@
+_metadata/
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.vscode/
+.idea/
+*.zip

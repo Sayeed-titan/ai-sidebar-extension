@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>AI Sidebar — Options</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <h1>AI Sidebar — Providers</h1>
+
+  <section>
+    <h2>Built-in</h2>
+    <ul id="builtin-list"></ul>
+  </section>
+
+  <section>
+    <div class="row-between">
+      <h2>Custom AIs</h2>
+      <button id="add-custom" class="primary">+ Add Custom AI</button>
+    </div>
+    <ul id="custom-list"></ul>
+  </section>
+
+  <dialog id="editor">
+    <form method="dialog">
+      <h3 id="editor-title">Add Custom AI</h3>
+
+      <label>
+        <span>Name</span>
+        <input id="f-label" type="text" placeholder="e.g. Mistral" required />
+      </label>
+
+      <label>
+        <span>Color</span>
+        <input id="f-color" type="color" value="#888888" />
+      </label>
+
+      <label>
+        <span>URL</span>
+        <input id="f-url" type="url" placeholder="https://chat.mistral.ai/chat" required />
+        <small>The page where the AI's chat input lives.</small>
+      </label>
+
+      <fieldset>
+        <legend>Selectors</legend>
+
+        <label>
+          <span>Prompt input</span>
+          <div class="picker-row">
+            <input id="f-input" type="text" placeholder="textarea or div[contenteditable='true']" required />
+            <button type="button" class="pick" data-field="input">Pick from page</button>
+          </div>
+        </label>
+
+        <label>
+          <span>Send button</span>
+          <div class="picker-row">
+            <input id="f-send" type="text" placeholder="button[aria-label='Send']" required />
+            <button type="button" class="pick" data-field="send">Pick from page</button>
+          </div>
+        </label>
+
+        <label>
+          <span>Assistant message <small>(optional, for "Save to notebook")</small></span>
+          <div class="picker-row">
+            <input id="f-msg" type="text" placeholder="div.message.assistant" />
+            <button type="button" class="pick" data-field="assistantMessage">Pick from page</button>
+          </div>
+        </label>
+      </fieldset>
+
+      <p id="pick-status" class="muted"></p>
+
+      <menu>
+        <button type="button" id="editor-cancel">Cancel</button>
+        <button type="button" id="editor-save" class="primary">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="lib/ais.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

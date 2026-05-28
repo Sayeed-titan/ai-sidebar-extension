@@ -1,0 +1,247 @@
+/* AI Sidebar — in-page pill + composer (light theme, Claude Design port) */
+
+.ais-pill-wrap,
+.ais-composer-wrap {
+  position: absolute;
+  z-index: 2147483647;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Pill ===== */
+.ais-pill {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #0f2340;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px 7px 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  box-shadow: 0 12px 40px -8px rgba(15,35,64,0.25), 0 2px 8px rgba(15,35,64,0.08);
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.ais-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 44px -6px rgba(15,35,64,0.28), 0 2px 8px rgba(15,35,64,0.08);
+}
+.ais-pill-mark {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0a7d9a, #0e9bb8);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.ais-pill-mark svg { width: 11px; height: 11px; display: block; }
+.ais-caret {
+  position: absolute;
+  top: -5px;
+  left: 18px;
+  width: 10px; height: 10px;
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  transform: rotate(45deg);
+}
+
+/* ===== Composer (forced light to defeat dark host pages) ===== */
+.ais-composer {
+  width: 380px !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 40px -8px rgba(15,35,64,0.25), 0 2px 8px rgba(15,35,64,0.08) !important;
+  font-size: 13px !important;
+  position: relative;
+}
+.ais-composer .ais-caret {
+  position: absolute;
+  top: -6px;
+  left: 24px;
+  width: 12px; height: 12px;
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  transform: rotate(45deg);
+}
+
+.ais-composer-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 6px;
+}
+.ais-composer-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+.ais-composer-src {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 500;
+  min-width: 0;
+}
+.ais-src-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #166534;
+  flex: none;
+}
+.ais-composer-src span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+.ais-composer-close {
+  margin-left: auto !important;
+  width: 24px !important; height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  color: #64748b !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  transition: background 120ms ease, color 120ms ease !important;
+}
+.ais-composer-close:hover { background: #f8fafc !important; color: #0f2340 !important; }
+.ais-composer-close svg { width: 14px; height: 14px; }
+
+/* ===== Chips ===== */
+.ais-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 14px 12px;
+  border-bottom: 1px solid #eef2f6;
+}
+.ais-chip {
+  all: unset;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 5px 10px 5px 9px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 999px !important;
+  transition: all 120ms ease !important;
+}
+.ais-chip.is-custom { border-style: dashed; }
+.ais-chip:hover { border-color: #cbd5e1; background: #f8fafc; }
+.ais-chip.is-on {
+  background: color-mix(in srgb, #0a7d9a 7%, white);
+  border-color: color-mix(in srgb, #0a7d9a 35%, #e2e8f0);
+  color: #0f2340;
+}
+.ais-brand-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+.ais-tick {
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: #0a7d9a;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -2px;
+}
+.ais-tick svg { width: 8px; height: 8px; display: block; }
+
+/* ===== Textarea ===== */
+.ais-textarea {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 12px 14px 10px !important;
+  border: 0 !important;
+  background: #ffffff !important;
+  resize: none !important;
+  font-family: inherit !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  color: #0f2340 !important;
+  min-height: 88px !important;
+  outline: none !important;
+}
+.ais-textarea::placeholder { color: #94a3b8 !important; }
+
+/* ===== Foot ===== */
+.ais-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid #eef2f6;
+}
+.ais-hint {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+.ais-hint kbd {
+  font: 600 10px/1 inherit;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 2px 5px;
+  margin: 0 1px;
+}
+
+.ais-send {
+  all: unset;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 8px 13px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  background: #0f2340 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 1px 2px rgba(15,35,64,0.25) !important;
+  transition: transform 120ms ease, background 120ms ease !important;
+  white-space: nowrap !important;
+  flex: none !important;
+}
+.ais-send:hover { background: #16315a !important; }
+.ais-send:active { transform: scale(0.97) !important; }
+.ais-send.is-disabled { background: #cbd5e1 !important; color: #fff !important; cursor: not-allowed !important; }
+.ais-send svg { width: 13px; height: 13px; display: block; }
+.ais-send-count {
+  background: rgba(255,255,255,0.16);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: 800;
+  margin: 0 1px;
+}

@@ -1,0 +1,78 @@
+{
+  "manifest_version": 3,
+  "name": "AI Sidebar",
+  "version": "1.0.0",
+  "description": "Select text on any page, ask multiple AIs at once, save and synthesize answers. A research workbench for the browser side panel.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "sidePanel",
+    "scripting",
+    "declarativeNetRequest",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://*.openai.com/*",
+    "https://claude.ai/*",
+    "https://*.anthropic.com/*",
+    "https://*.perplexity.ai/*",
+    "https://perplexity.ai/*",
+    "https://gemini.google.com/*",
+    "https://accounts.google.com/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  },
+  "action": {
+    "default_title": "AI Sidebar"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": ["lib/ais.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": ["lib/ais.js", "injector.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["panel.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "frame_unblock",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
+}
