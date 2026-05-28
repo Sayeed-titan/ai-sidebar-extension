@@ -9,7 +9,8 @@
     "sidePanel",
     "scripting",
     "declarativeNetRequest",
-    "contextMenus"
+    "contextMenus",
+    "tabs"
   ],
   "host_permissions": [
     "https://chatgpt.com/*",

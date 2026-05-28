@@ -50,39 +50,37 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
   if (info.menuItemId === "ais_ask_all") {
     const providers = await getAllProviderRefs();
-    dispatch(tab.id, providers.map((p) => p.id), text, source);
+    dispatch(tab.id, tab.windowId, providers.map((p) => p.id), text, source);
     return;
   }
   const match = /^ais_ask_(.+)$/.exec(String(info.menuItemId));
-  if (match) dispatch(tab.id, [match[1]], text, source);
+  if (match) dispatch(tab.id, tab.windowId, [match[1]], text, source);
 });
 
 // ---------- prompt dispatch ----------
+// Prompts are scoped per browser window: the `last_<windowId>` key in
+// chrome.storage.session is read only by the panel running in that window,
+// so opening a fresh side panel in another window won't replay it.
 
-function dispatch(tabId, aiIds, text, source) {
-  // ORDER MATTERS: sidePanel.open() needs the user gesture that triggered us.
-  // An awaited storage write before it can break the gesture chain in MV3 and
-  // the panel silently won't open. So: write storage synchronously (fire-and-
-  // forget; the Promise resolves long before the panel page reads it), call
-  // setOptions + open synchronously, then notify any already-open panel.
+function dispatch(tabId, windowId, aiIds, text, source) {
   const ts = Date.now();
-  const stash = { last: { aiId: aiIds[0], aiIds, text, source, ts } };
-  for (const id of aiIds) stash[`pending_${id}`] = { text, source, ts };
+  const stash = {};
+  stash[`last_${windowId}`] = { aiId: aiIds[0], aiIds, text, source, ts, windowId };
+  for (const id of aiIds) stash[`pending_${id}`] = { text, source, ts, windowId };
   chrome.storage.session.set(stash);
 
   if (tabId != null) {
     try { chrome.sidePanel.setOptions({ tabId, path: "panel.html", enabled: true }); } catch (_) {}
     chrome.sidePanel.open({ tabId }).catch(async (err) => {
-      // Fall back to windowId if per-tab open fails
       try {
-        const tab = await chrome.tabs.get(tabId);
-        await chrome.sidePanel.open({ windowId: tab.windowId });
-      } catch (e2) {
-        console.warn("sidePanel.open failed", err, e2);
-      }
+        const t = await chrome.tabs.get(tabId);
+        await chrome.sidePanel.open({ windowId: t.windowId });
+      } catch (e2) { console.warn("sidePanel.open failed", err, e2); }
     });
   }
-  chrome.runtime.sendMessage({ type: "PANEL_LOAD", aiIds, text, source }).catch(() => {});
+  // Notify any already-open panel; it filters by windowId so only the
+  // originating window's panel reacts.
+  chrome.runtime.sendMessage({ type: "PANEL_LOAD", aiIds, text, source, windowId }).catch(() => {});
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -91,8 +89,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "ASK_AI") {
     const aiIds = Array.isArray(msg.aiIds) ? msg.aiIds : [msg.aiId];
     const tabId = sender.tab && sender.tab.id;
+    const winId = sender.tab && sender.tab.windowId;
     const source = msg.source || (sender.tab ? { url: sender.tab.url, title: sender.tab.title } : null);
-    dispatch(tabId, aiIds, msg.text, source);
+    dispatch(tabId, winId, aiIds, msg.text, source);
     sendResponse({ ok: true });
     return;
   }

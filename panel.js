@@ -280,9 +280,13 @@ function handlePrompt(aiIds, text, source) {
   if (embedded.length > 0) activate(embedded[0]);
 }
 
+let myWindowId = null; // cached per panel page; each window owns its own
+
 chrome.runtime.onMessage.addListener((msg) => {
   if (!msg) return;
   if (msg.type === "PANEL_LOAD") {
+    // Only the panel in the originating window should react to a broadcast.
+    if (myWindowId != null && msg.windowId != null && msg.windowId !== myWindowId) return;
     const ids = msg.aiIds || (msg.aiId ? [msg.aiId] : []);
     handlePrompt(ids, msg.text, msg.source);
   } else if (msg.type === "NOTEBOOK_UPDATED" && mode === "notebook") {
@@ -291,15 +295,26 @@ chrome.runtime.onMessage.addListener((msg) => {
 });
 
 (async () => {
+  // Identify which window this panel belongs to so we only respond to its
+  // events. Fixes "sidebar opened in window A also replays in window B".
+  try {
+    const win = await chrome.windows.getCurrent();
+    myWindowId = win.id;
+  } catch (_) {}
+
   const { panelMode } = await chrome.storage.local.get("panelMode");
   setMode(panelMode === "split" ? "split" : panelMode === "notebook" ? "notebook" : "single");
   renderTabs();
-  const { last } = await chrome.storage.session.get("last");
-  if (last) {
-    const ids = last.aiIds || [last.aiId];
-    handlePrompt(ids, last.text, last.source);
-    // Clear `last` so re-opening the panel later doesn't replay a stale prompt
-    chrome.storage.session.remove("last");
+
+  if (myWindowId != null) {
+    const key = `last_${myWindowId}`;
+    const data = await chrome.storage.session.get(key);
+    const last = data && data[key];
+    if (last) {
+      const ids = last.aiIds || [last.aiId];
+      handlePrompt(ids, last.text, last.source);
+      chrome.storage.session.remove(key);
+    }
   }
 })();
 
