@@ -113,7 +113,13 @@
     );
 
     if (sendBtn) {
-      sendBtn.click();
+      clickReally(sendBtn);
+      // Defence in depth: if the click was swallowed (Angular Material,
+      // some MDC buttons) the input still has text after a beat — fall back
+      // to pressing Enter on the input itself.
+      await sleep(400);
+      const stillFull = (input.value || input.textContent || "").trim().length > 0;
+      if (stillFull) pressEnter(input);
     } else {
       pressEnter(input);
     }
@@ -168,6 +174,24 @@
     el.dispatchEvent(new KeyboardEvent("keydown", opts));
     el.dispatchEvent(new KeyboardEvent("keypress", opts));
     el.dispatchEvent(new KeyboardEvent("keyup", opts));
+  }
+
+  // Many framework buttons (Angular Material, MDC, some React) don't react
+  // to a bare .click() — they bind to pointer/mouse events. Fire the full
+  // sequence so the button responds the way it would to a real user click.
+  function clickReally(el) {
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const base = { bubbles: true, cancelable: true, view: window, button: 0, buttons: 1, clientX: cx, clientY: cy };
+    try { el.focus(); } catch (_) {}
+    try { el.dispatchEvent(new PointerEvent("pointerdown", { ...base, pointerType: "mouse" })); } catch (_) {}
+    try { el.dispatchEvent(new MouseEvent("mousedown", base)); } catch (_) {}
+    try { el.dispatchEvent(new PointerEvent("pointerup", { ...base, pointerType: "mouse" })); } catch (_) {}
+    try { el.dispatchEvent(new MouseEvent("mouseup", base)); } catch (_) {}
+    try { el.dispatchEvent(new MouseEvent("click", base)); } catch (_) {}
+    // Belt-and-suspenders — if the element implements its own click handler.
+    try { el.click(); } catch (_) {}
   }
 
   function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
